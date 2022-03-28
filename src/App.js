@@ -11,6 +11,7 @@ const theme = createTheme({
 
 function App() {
   const [rows, setRows] = useState([{op: 0, value: "", disabled: false}])
+  const [ready, setReady] = useState(false)
   const [total, setTotal] = useState(0)
 
   const handleChangeValue = (v, i) => {
@@ -18,6 +19,7 @@ function App() {
     let newRow  = {...newRows[i], value: v}
     newRows[i] = newRow
     setRows(newRows)
+    setReady(true)
   }
 
   const handleChangeOperator = (v, i) => {
@@ -25,11 +27,13 @@ function App() {
     let newRow  = {...newRows[i], op: v}
     newRows[i] = newRow
     setRows(newRows)
+    setReady(true)
   }
 
   const handleDelete = (i) => {
     let newRows = rows.filter((r,j) => j !== i)
     setRows(newRows)
+    setReady(true)
   }
 
   const handleDisable = (i) => {
@@ -38,6 +42,7 @@ function App() {
     newRow.disabled = !newRow.disabled
     newRows[i] = newRow
     setRows(newRows)
+    setReady(true)
   }
 
   const handleAdd = () => {
@@ -47,16 +52,20 @@ function App() {
       disabled: false,
     }
     setRows(old => old.concat(newRow))
+    setReady(true)
   }
 
   useEffect(() => {
-    let sum = 0
-    rows.forEach(r => {
-      if(!r.disabled)
-        r.op === 0 ? sum += +r.value : sum -= +r.value
-    })
-    setTotal(sum)
-  }, [rows])
+    if(ready){
+      setReady(false)
+      let sum = 0
+      rows.forEach(r => {
+        if(!r.disabled)
+          r.op === 0 ? sum += +r.value : sum -= +r.value
+      })
+      setTotal(sum)
+    }
+  }, [ready, rows])
 
   return <ThemeProvider theme={theme}>
   <Container sx={{maxWidth: 'lg', my: '32px'}}>
